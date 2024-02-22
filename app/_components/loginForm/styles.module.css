@@ -1,0 +1,29 @@
+.button_google {
+	display: flex !important;
+	flex: 1 !important;
+	border: 2px solid #000000 !important;
+	background: #000000 !important;
+	transition: 0.2s !important;
+}
+.button_google:hover {
+	cursor: pointer !important;
+	background: #ffffff !important;
+}
+.button_github {
+	display: flex !important;
+	flex: 1 !important;
+	border: 2px solid #000000 !important;
+	background: #000000 !important;
+	transition: 0.2s !important;
+}
+.button_github:hover {
+	cursor: pointer !important;
+	background: #ffffff !important;
+}
+.button_github_icon {
+	fill: #ffffff !important;
+	transition: 0.2s !important;
+}
+.button_github:hover .button_github_icon {
+	fill: #000000 !important;
+}
