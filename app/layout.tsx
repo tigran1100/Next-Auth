@@ -1,6 +1,10 @@
 // NextJS
 import type { Metadata } from "next";
 
+// Radix UI
+import "@radix-ui/themes/styles.css";
+import { Theme } from "@radix-ui/themes";
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -8,7 +12,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body>{children}</body>
+			<body>
+				<Theme>{children}</Theme>
+			</body>
 		</html>
 	);
 }
