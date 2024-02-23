@@ -1,14 +1,13 @@
-// Components
-import Form from "./_components/loginForm/form";
+import Link from "next/link";
 
-export default function Home() {
+const Page = () => {
 	return (
 		<>
-			<div className="page_content_large h-full">
-				<div className="w-full h-full flex justify-center items-center">
-					<Form />
-				</div>
-			</div>
+			<Link href="/auth/signin">Go to Signin page</Link>
+			<br />
+			<Link href="/auth/signup">Go to Signup page</Link>
 		</>
 	);
-}
+};
+
+export default Page;
