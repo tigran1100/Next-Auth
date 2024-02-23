@@ -28,13 +28,55 @@ import { loginSchema } from "@/schemas/auth";
 // React Hook Form
 import { useForm } from "react-hook-form";
 
+// Actions
+import { do_login } from "@/actions/do_login";
+
 // Css
 import styles from "./styles.module.css";
 
-const loginForm = () => {
+const LoginForm = () => {
 	const useFormVar = useForm();
 
-	const do_submit = (formData: z.infer<typeof loginSchema>) => {};
+	const [form_is_submittimg, set_form_is_submittimg] = useState(false);
+	const [custom_error, set_custom_error] = useState("");
+
+	const do_submit = async (formData: z.infer<typeof loginSchema>) => {
+		set_custom_error("");
+		set_form_is_submittimg(true);
+
+		const result = await do_login(formData);
+		useFormVar.reset();
+
+		set_form_is_submittimg(false);
+
+		if (result.success === 0) {
+			console.log(result);
+			set_custom_error(result.reason as string);
+		}
+	};
+
+	const CalloutButtons = () => {
+		return (
+			(useFormVar.formState.errors.usernameOrEmail ||
+				useFormVar.formState.errors.password ||
+				custom_error) && (
+				<>
+					<Callout.Root size="1" color="red" className="!py-2">
+						<Callout.Text>
+							<>
+								{useFormVar.formState.errors?.usernameOrEmail
+									?.message ||
+									useFormVar.formState.errors?.password
+										?.message ||
+									custom_error ||
+									""}
+							</>
+						</Callout.Text>
+					</Callout.Root>
+				</>
+			)
+		);
+	};
 
 	return (
 		<>
@@ -61,50 +103,21 @@ const loginForm = () => {
 							type="email"
 							placeholder="Username or Email"
 							className="!w-full !max-w-none !py-5"
+							disabled={form_is_submittimg}
 						/>
 						<TextField.Input
 							{...useFormVar.register("password", {
-								required: "Password is required",
+								// required: "Password is required",
 							})}
 							type="password"
 							placeholder="Password"
 							className="!w-full !max-w-none !py-5"
+							disabled={form_is_submittimg}
 						/>
-						{/* {form_error && (
-							<>
-								<Callout.Root
-									size="1"
-									color="red"
-									className="!py-2"
-								>
-									<Callout.Text>{form_error}</Callout.Text>
-								</Callout.Root>
-							</>
-						)} */}
-
-						{(useFormVar.formState.errors.usernameOrEmail ||
-							useFormVar.formState.errors.password) && (
-							<>
-								<Callout.Root
-									size="1"
-									color="red"
-									className="!py-2"
-								>
-									<Callout.Text>
-										<>
-											{useFormVar.formState.errors
-												?.usernameOrEmail?.message ||
-												useFormVar.formState.errors
-													?.password?.message ||
-												"asd"}
-										</>
-									</Callout.Text>
-								</Callout.Root>
-							</>
-						)}
+						<CalloutButtons />
 						<Button
 							type="submit"
-							disabled={useFormVar.formState.isSubmitting}
+							disabled={form_is_submittimg}
 							className="!cursor-pointer !transition-all"
 						>
 							Submit
@@ -133,17 +146,17 @@ const loginForm = () => {
 					</Button>
 				</Flex>
 				<Text className="!mt-3 !text-center">
-					Don't have an account?{" "}
+					Don&apos;t have an account?&nbsp;
 					<Link
 						href="/signin"
 						className="text-blue-600 hover:!underline"
 					>
 						Signin
-					</Link>{" "}
+					</Link>
 				</Text>
 			</div>
 		</>
 	);
 };
 
-export default loginForm;
+export default LoginForm;
