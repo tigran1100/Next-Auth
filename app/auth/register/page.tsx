@@ -22,13 +22,13 @@ import {
 
 // Zod
 import { z } from "zod";
-import { loginSchema } from "@/schemas/auth";
+import { registerSchema } from "@/schemas/auth";
 
 // React Hook Form
 import { useForm } from "react-hook-form";
 
 // Actions
-import { do_login } from "@/actions/do_login";
+import { do_register } from "@/actions/do_register";
 
 // Components
 import OAuthButtons from "../_components/oauthButtons/buttons";
@@ -40,33 +40,37 @@ export default function Home() {
 	const [form_is_submittimg, set_form_is_submittimg] = useState(false);
 	const [custom_error, set_custom_error] = useState("");
 
-	const do_submit = async (formData: z.infer<typeof loginSchema>) => {
+	const do_submit = async (formData: z.infer<typeof registerSchema>) => {
 		set_custom_error("");
 		set_form_is_submittimg(true);
 
-		const result = await do_login(formData);
+		const result = await do_register(formData);
 		useFormVar.reset();
 
 		set_form_is_submittimg(false);
 
 		if (result.success === 0) {
-			console.log(result);
 			set_custom_error(result.reason as string);
 		}
 	};
 
 	const CalloutButtons = () => {
 		return (
-			(useFormVar.formState.errors.usernameOrEmail ||
+			(useFormVar.formState.errors.name ||
+				useFormVar.formState.errors.usernameOrEmail ||
 				useFormVar.formState.errors.password ||
+				useFormVar.formState.errors.passwordConfirm ||
 				custom_error) && (
 				<>
 					<Callout.Root size="1" color="red" className="!py-2">
 						<Callout.Text>
 							<>
-								{useFormVar.formState.errors?.usernameOrEmail
-									?.message ||
-									useFormVar.formState.errors?.password
+								{useFormVar.formState.errors.name?.message ||
+									useFormVar.formState.errors.usernameOrEmail
+										?.message ||
+									useFormVar.formState.errors.password
+										?.message ||
+									useFormVar.formState.errors.passwordConfirm
 										?.message ||
 									custom_error ||
 									""}
@@ -89,7 +93,7 @@ export default function Home() {
 						<form
 							onSubmit={useFormVar.handleSubmit((formData) => {
 								do_submit(
-									formData as z.infer<typeof loginSchema>
+									formData as z.infer<typeof registerSchema>
 								);
 							})}
 							className="!w-full"
@@ -100,6 +104,20 @@ export default function Home() {
 								gap="3"
 							>
 								<TextField.Input
+									{...useFormVar.register("name", {
+										required: "Name is required",
+										minLength: {
+											value: 2,
+											message:
+												"Name must be at lease 2 characters long",
+										},
+									})}
+									type="text"
+									placeholder="Name"
+									className="!w-full !max-w-none !py-5"
+									disabled={form_is_submittimg}
+								/>
+								<TextField.Input
 									{...useFormVar.register("usernameOrEmail", {
 										required:
 											"Username or Email is required",
@@ -109,17 +127,45 @@ export default function Home() {
 												"Username or email must be at lease 3 characters long",
 										},
 									})}
-									type="email"
+									type="text"
 									placeholder="Username or Email"
 									className="!w-full !max-w-none !py-5"
 									disabled={form_is_submittimg}
 								/>
 								<TextField.Input
 									{...useFormVar.register("password", {
-										// required: "Password is required",
+										required: "Password is required",
+										minLength: {
+											value: 6,
+											message:
+												"Password must be at lease 6 characters long",
+										},
 									})}
 									type="password"
 									placeholder="Password"
+									className="!w-full !max-w-none !py-5"
+									disabled={form_is_submittimg}
+								/>
+								<TextField.Input
+									{...useFormVar.register("passwordConfirm", {
+										required:
+											"Password confirmation is required",
+										minLength: {
+											value: 6,
+											message:
+												"Password must be at lease 6 characters long",
+										},
+										validate: (val: string) => {
+											if (
+												useFormVar.watch("password") !=
+												val
+											) {
+												return "The passwords did not match";
+											}
+										},
+									})}
+									type="password"
+									placeholder="Confirm password"
 									className="!w-full !max-w-none !py-5"
 									disabled={form_is_submittimg}
 								/>
@@ -129,7 +175,7 @@ export default function Home() {
 									disabled={form_is_submittimg}
 									className="!cursor-pointer !transition-all"
 								>
-									Submit
+									Create an account
 								</Button>
 							</Flex>
 						</form>

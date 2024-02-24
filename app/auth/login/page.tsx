@@ -50,7 +50,6 @@ export default function Home() {
 		set_form_is_submittimg(false);
 
 		if (result.success === 0) {
-			console.log(result);
 			set_custom_error(result.reason as string);
 		}
 	};
@@ -116,7 +115,11 @@ export default function Home() {
 								/>
 								<TextField.Input
 									{...useFormVar.register("password", {
-										// required: "Password is required",
+										required: "Password is required",
+										minLength: {
+											value: 1,
+											message: "Password is required",
+										},
 									})}
 									type="password"
 									placeholder="Password"
