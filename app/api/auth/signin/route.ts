@@ -14,6 +14,9 @@ import { registerSchema } from "@/schemas/auth";
 // Bcrypt
 import bcrypt from "bcrypt";
 
+// Utils
+import { getUserByEmail, getUserByUsername } from "@/app/_utils/user";
+
 export async function POST(request: NextRequest) {
 	// Validating the request body
 	if (
@@ -45,11 +48,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	// Checking if email exists
-	const usernameCheck = await prisma?.user.findUnique({
-		where: {
-			username: body.username,
-		},
-	});
+	const usernameCheck = await getUserByUsername(body.username);
 
 	if (usernameCheck) {
 		return NextResponse.json(
@@ -62,11 +61,7 @@ export async function POST(request: NextRequest) {
 		);
 	}
 
-	const emailCheck = await prisma?.user.findUnique({
-		where: {
-			email: body.email,
-		},
-	});
+	const emailCheck = await getUserByEmail(body.email);
 
 	if (emailCheck) {
 		return NextResponse.json(
