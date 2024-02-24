@@ -132,7 +132,7 @@ export default function Home() {
 									disabled={form_is_submittimg}
 									className="!cursor-pointer !transition-all"
 								>
-									Submit
+									Login
 								</Button>
 							</Flex>
 						</form>
@@ -144,7 +144,7 @@ export default function Home() {
 								href="/auth/register"
 								className="text-blue-600 hover:!underline"
 							>
-								Signin
+								Register
 							</Link>
 						</Text>
 					</div>

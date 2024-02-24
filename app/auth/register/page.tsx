@@ -2,6 +2,7 @@
 
 //Next JS
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // React
 import { FormEvent, useState } from "react";
@@ -20,6 +21,9 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 
+// Axios
+import axios from "axios";
+
 // Zod
 import { z } from "zod";
 import { registerSchema } from "@/schemas/auth";
@@ -27,14 +31,12 @@ import { registerSchema } from "@/schemas/auth";
 // React Hook Form
 import { useForm } from "react-hook-form";
 
-// Actions
-import { do_register } from "@/actions/do_register";
-
 // Components
 import OAuthButtons from "../_components/oauthButtons/buttons";
 import OrDivider from "../_components/orDivider/divider";
 
 export default function Home() {
+	const router = useRouter();
 	const useFormVar = useForm();
 
 	const [form_is_submittimg, set_form_is_submittimg] = useState(false);
@@ -44,20 +46,37 @@ export default function Home() {
 		set_custom_error("");
 		set_form_is_submittimg(true);
 
-		const result = await do_register(formData);
-		useFormVar.reset();
+		await axios
+			.post("/api/auth/signin", formData)
+			.then((res) => {
+				let data = res.data;
+				if (data.success === 1) {
+					set_custom_error("");
+					router.push("/");
+					router.refresh();
+				} else {
+					set_custom_error(data.reason);
+				}
+			})
+			.catch((err) => {
+				console.warn(err);
+				let data = err.response.data;
+
+				if (data?.reason) {
+					set_custom_error(data.reason);
+				} else {
+					set_custom_error("Something went wrong");
+				}
+			});
 
 		set_form_is_submittimg(false);
-
-		if (result.success === 0) {
-			set_custom_error(result.reason as string);
-		}
+		useFormVar.reset();
 	};
 
 	const CalloutButtons = () => {
 		return (
-			(useFormVar.formState.errors.name ||
-				useFormVar.formState.errors.usernameOrEmail ||
+			(useFormVar.formState.errors.username ||
+				useFormVar.formState.errors.email ||
 				useFormVar.formState.errors.password ||
 				useFormVar.formState.errors.passwordConfirm ||
 				custom_error) && (
@@ -65,8 +84,9 @@ export default function Home() {
 					<Callout.Root size="1" color="red" className="!py-2">
 						<Callout.Text>
 							<>
-								{useFormVar.formState.errors.name?.message ||
-									useFormVar.formState.errors.usernameOrEmail
+								{useFormVar.formState.errors.username
+									?.message ||
+									useFormVar.formState.errors.email
 										?.message ||
 									useFormVar.formState.errors.password
 										?.message ||
@@ -104,31 +124,30 @@ export default function Home() {
 								gap="3"
 							>
 								<TextField.Input
-									{...useFormVar.register("name", {
-										required: "Name is required",
+									{...useFormVar.register("username", {
+										required: "Username is required",
 										minLength: {
 											value: 2,
 											message:
-												"Name must be at lease 2 characters long",
+												"Username must be at lease 2 characters long",
 										},
 									})}
 									type="text"
-									placeholder="Name"
+									placeholder="Username"
 									className="!w-full !max-w-none !py-5"
 									disabled={form_is_submittimg}
 								/>
 								<TextField.Input
-									{...useFormVar.register("usernameOrEmail", {
-										required:
-											"Username or Email is required",
+									{...useFormVar.register("email", {
+										required: "Email is required",
 										minLength: {
 											value: 3,
 											message:
-												"Username or email must be at lease 3 characters long",
+												"Email must be at lease 3 characters long",
 										},
 									})}
-									type="text"
-									placeholder="Username or Email"
+									type="email"
+									placeholder="Email"
 									className="!w-full !max-w-none !py-5"
 									disabled={form_is_submittimg}
 								/>
@@ -187,7 +206,7 @@ export default function Home() {
 								href="/auth/login"
 								className="text-blue-600 hover:!underline"
 							>
-								Signup
+								Login
 							</Link>
 						</Text>
 					</div>
@@ -196,3 +215,6 @@ export default function Home() {
 		</>
 	);
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
