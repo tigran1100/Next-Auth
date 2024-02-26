@@ -2,6 +2,7 @@
 
 //Next JS
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 // React
 import { FormEvent, useState } from "react";
@@ -20,6 +21,9 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 
+// Axios
+import axios from "axios";
+
 // Zod
 import { z } from "zod";
 import { loginSchema } from "@/schemas/auth";
@@ -27,14 +31,12 @@ import { loginSchema } from "@/schemas/auth";
 // React Hook Form
 import { useForm } from "react-hook-form";
 
-// Actions
-import { do_login } from "@/actions/do_login";
-
 // Components
 import OAuthButtons from "../_components/oauthButtons/buttons";
 import OrDivider from "../_components/orDivider/divider";
 
 export default function Home() {
+	const router = useRouter();
 	const useFormVar = useForm();
 
 	const [form_is_submittimg, set_form_is_submittimg] = useState(false);
@@ -44,14 +46,31 @@ export default function Home() {
 		set_custom_error("");
 		set_form_is_submittimg(true);
 
-		const result = await do_login(formData);
-		useFormVar.reset();
+		await axios
+			.post("/api/auth/signin", formData)
+			.then((res) => {
+				let data = res.data;
+				if (data.success === 1) {
+					set_custom_error("");
+					router.push("/");
+					router.refresh();
+					useFormVar.reset();
+				} else {
+					set_custom_error(data.reason);
+				}
+			})
+			.catch((err) => {
+				console.warn(err);
+				let data = err.response.data;
+
+				if (data?.reason) {
+					set_custom_error(data.reason);
+				} else {
+					set_custom_error("Something went wrong");
+				}
+			});
 
 		set_form_is_submittimg(false);
-
-		if (result.success === 0) {
-			set_custom_error(result.reason as string);
-		}
 	};
 
 	const CalloutButtons = () => {
@@ -108,7 +127,7 @@ export default function Home() {
 												"Username or email must be at lease 3 characters long",
 										},
 									})}
-									type="email"
+									type="text"
 									placeholder="Username or Email"
 									className="!w-full !max-w-none !py-5"
 									disabled={form_is_submittimg}

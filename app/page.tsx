@@ -3,9 +3,9 @@ import Link from "next/link";
 const Page = () => {
 	return (
 		<>
-			<Link href="/auth/signin">Go to Signin page</Link>
+			<Link href="/auth/login">Go to login page</Link>
 			<br />
-			<Link href="/auth/signup">Go to Signup page</Link>
+			<Link href="/auth/register">Go to register page</Link>
 		</>
 	);
 };

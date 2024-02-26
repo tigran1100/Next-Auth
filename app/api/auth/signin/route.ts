@@ -1,21 +1,19 @@
 // NextJS
 import { NextRequest, NextResponse } from "next/server";
 
-// NextAuth
-import { getServerSession } from "next-auth";
+// AuthJS
+import { signIn } from "@/auth";
 
 // Prisma
 import prisma from "@/prisma/client";
 
 // Zod
 import { z } from "zod";
-import { registerSchema } from "@/schemas/auth";
-
-// Bcrypt
-import bcrypt from "bcrypt";
+import { loginSchema } from "@/schemas/auth";
 
 // Utils
 import { getUserByEmail, getUserByUsername } from "@/app/_utils/user";
+import { AuthError } from "next-auth";
 
 export async function POST(request: NextRequest) {
 	// Validating the request body
@@ -34,7 +32,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	const body = await request.json();
-	const validation = registerSchema.safeParse(body);
+	const validation = loginSchema.safeParse(body);
 
 	if (!validation.success) {
 		return NextResponse.json(
@@ -47,61 +45,47 @@ export async function POST(request: NextRequest) {
 		);
 	}
 
-	// Checking if email exists
-	const usernameCheck = await getUserByUsername(body.username);
+	try {
+		await signIn("credentials", {
+			usernameOrEmail: body.usernameOrEmail,
+			password: body.password,
+			redirect: false,
+		});
 
-	if (usernameCheck) {
-		return NextResponse.json(
-			{
-				success: 0,
-				reason: "Username is already taken",
-				data: { body: body },
-			},
-			{ status: 409 }
-		);
-	}
-
-	const emailCheck = await getUserByEmail(body.email);
-
-	if (emailCheck) {
-		return NextResponse.json(
-			{
-				success: 0,
-				reason: "Email is already taken",
-				data: { body: body },
-			},
-			{ status: 409 }
-		);
-	}
-
-	// Hashing the password
-	const hashedPassword = await bcrypt.hash(body.password, 10);
-
-	const create_user_request = await prisma.user.create({
-		data: {
-			username: body.username,
-			email: body.email,
-			password: hashedPassword,
-		},
-	});
-
-	if (create_user_request) {
 		return NextResponse.json(
 			{
 				success: 1,
-				reason: "User successfully created",
+				reason: "1",
 				data: { body: body },
 			},
-			{ status: 201 }
+			{ status: 200 }
 		);
-	} else {
-		return NextResponse.json(
-			{
-				success: 0,
-				reason: "Something went wrong",
-				data: { body: body },
-			},
-			{ status: 500 }
-		);
+	} catch (error) {
+		if (error instanceof AuthError) {
+			switch (error.type) {
+				case "CredentialsSignin": {
+					return NextResponse.json(
+						{
+							success: 0,
+							reason: "Invalid Credentials",
+							data: { body: body },
+						},
+						{ status: 400 }
+					);
+				}
+				default: {
+					return NextResponse.json(
+						{
+							success: 0,
+							reason: "Something went wrong",
+							data: { body: body },
+						},
+						{ status: 400 }
+					);
+				}
+			}
+		}
+
+		throw error;
 	}
 }

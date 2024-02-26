@@ -47,13 +47,14 @@ export default function Home() {
 		set_form_is_submittimg(true);
 
 		await axios
-			.post("/api/auth/signin", formData)
+			.post("/api/auth/signup", formData)
 			.then((res) => {
 				let data = res.data;
 				if (data.success === 1) {
 					set_custom_error("");
 					router.push("/");
 					router.refresh();
+					useFormVar.reset();
 				} else {
 					set_custom_error(data.reason);
 				}
@@ -70,7 +71,6 @@ export default function Home() {
 			});
 
 		set_form_is_submittimg(false);
-		useFormVar.reset();
 	};
 
 	const CalloutButtons = () => {
