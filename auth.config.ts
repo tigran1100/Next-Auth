@@ -51,11 +51,17 @@ export default {
 						password,
 						user.password
 					);
+
 					// Continue if everything is ok
 					if (passwordsMach) {
 						return {
-							name: user.username,
-							email: user.email,
+							custom_is_logged_from_form: true,
+							custom_id: user.id || null,
+							custom_username: user.username || null,
+							custom_email: user.email || null,
+							custom_emailVerified: user.emailVerified || null,
+							name: user.username || null,
+							email: user.email || null,
 							image: null,
 						};
 					}

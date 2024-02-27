@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // AuthJS
 import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
 
 // Prisma
 import prisma from "@/prisma/client";
@@ -13,7 +14,6 @@ import { loginSchema } from "@/schemas/auth";
 
 // Utils
 import { getUserByEmail, getUserByUsername } from "@/app/_utils/user";
-import { AuthError } from "next-auth";
 
 export async function POST(request: NextRequest) {
 	// Validating the request body

@@ -1,6 +1,10 @@
 // NextJS
 import { NextRequest, NextResponse } from "next/server";
 
+// NextAuth
+import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
+
 // Prisma
 import prisma from "@/prisma/client";
 
@@ -83,14 +87,49 @@ export async function POST(request: NextRequest) {
 	});
 
 	if (create_user_request) {
-		return NextResponse.json(
-			{
-				success: 1,
-				reason: "User successfully created",
-				data: { body: body },
-			},
-			{ status: 201 }
-		);
+		try {
+			await signIn("credentials", {
+				usernameOrEmail: body.username,
+				password: body.password,
+				redirect: false,
+			});
+
+			return NextResponse.json(
+				{
+					success: 1,
+					reason: "1",
+					data: { body: body },
+				},
+				{ status: 202 }
+			);
+		} catch (error) {
+			if (error instanceof AuthError) {
+				switch (error.type) {
+					case "CredentialsSignin": {
+						return NextResponse.json(
+							{
+								success: 0,
+								reason: "Invalid Credentials",
+								data: { body: body },
+							},
+							{ status: 400 }
+						);
+					}
+					default: {
+						return NextResponse.json(
+							{
+								success: 0,
+								reason: "Something went wrong",
+								data: { body: body },
+							},
+							{ status: 400 }
+						);
+					}
+				}
+			}
+
+			throw error;
+		}
 	} else {
 		return NextResponse.json(
 			{
