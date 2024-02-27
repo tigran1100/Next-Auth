@@ -1,3 +1,6 @@
+// NextAuth
+import { signIn } from "next-auth/react";
+
 // React Icons
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -9,6 +12,12 @@ import { Button, Flex } from "@radix-ui/themes";
 import styles from "./styles.module.css";
 
 const Buttons = () => {
+	const onClick = async (provider: "google" | "github") => {
+		signIn(provider, {
+			callbackUrl: "/",
+		});
+	};
+
 	return (
 		<>
 			<Flex
@@ -17,10 +26,20 @@ const Buttons = () => {
 				justify="between"
 				className="!w-full !min-h-fit"
 			>
-				<Button className={styles.button_google}>
+				<Button
+					className={styles.button_google}
+					onClick={() => {
+						onClick("google");
+					}}
+				>
 					<FcGoogle size="18px" />
 				</Button>
-				<Button className={styles.button_github}>
+				<Button
+					className={styles.button_github}
+					onClick={() => {
+						onClick("github");
+					}}
+				>
 					<FaGithub
 						size="20px"
 						className={styles.button_github_icon}

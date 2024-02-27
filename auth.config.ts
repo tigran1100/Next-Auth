@@ -1,6 +1,8 @@
 // AuthJS
 import Credentials from "next-auth/providers/credentials";
 import type { NextAuthConfig } from "next-auth";
+import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 
 // Zod
 import { loginSchema } from "./schemas/auth";
@@ -12,7 +14,30 @@ import bcrypt from "bcryptjs";
 import { getUserByEmail, getUserByUsername } from "./app/_utils/user";
 
 export default {
+	events: {
+		async linkAccount({ user }) {
+			if (user.email) {
+				await prisma?.user.update({
+					data: {
+						emailVerified: new Date(),
+					},
+					where: {
+						email: user.email,
+					},
+				});
+			}
+			console.log("User from linkAccount: ", user);
+		},
+	},
 	providers: [
+		GitHub({
+			clientId: process.env.GITHUB_CLIENT_ID,
+			clientSecret: process.env.GITHUB_CLIENT_SECRET,
+		}),
+		Google({
+			clientId: process.env.GOOGLE_CLIENT_ID,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+		}),
 		Credentials({
 			async authorize(credentials) {
 				// Checking fields validity
