@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 // React
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 // React Icons
 import { FaGithub } from "react-icons/fa";
@@ -35,12 +35,24 @@ import { useForm } from "react-hook-form";
 import OAuthButtons from "../_components/oauthButtons/buttons";
 import OrDivider from "../_components/orDivider/divider";
 
-export default function Home() {
+interface Props {
+	searchParams: {
+		error?: string;
+	};
+}
+
+export default function Home(Props: Props) {
 	const router = useRouter();
 	const useFormVar = useForm();
 
 	const [form_is_submittimg, set_form_is_submittimg] = useState(false);
 	const [custom_error, set_custom_error] = useState("");
+
+	useEffect(() => {
+		if (Props.searchParams?.error === "OAuthAccountNotLinked") {
+			set_custom_error("Email is already in use with different provider");
+		}
+	}, [Props.searchParams]);
 
 	const do_submit = async (formData: z.infer<typeof loginSchema>) => {
 		set_custom_error("");
