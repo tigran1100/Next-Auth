@@ -17,6 +17,7 @@ import bcrypt from "bcrypt";
 
 // Utils
 import { getUserByEmail, getUserByUsername } from "@/app/_utils/user";
+import { generateVerificationToken } from "@/app/_utils/tokens";
 
 export async function POST(request: NextRequest) {
 	// Validating the request body

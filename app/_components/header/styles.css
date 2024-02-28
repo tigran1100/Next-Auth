@@ -1,0 +1,16 @@
+.c_header{
+
+}
+.c_header_inner{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+}
+.c_header_left{
+
+}
+.c_header_right{
+    
+}
