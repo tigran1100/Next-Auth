@@ -1,6 +1,9 @@
 // NextJS
 import type { Metadata } from "next";
 
+// NextAuth
+import { SessionProvider } from "next-auth/react";
+
 // Radix UI
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
@@ -16,7 +19,9 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body>
-				<Theme>{children}</Theme>
+				<Theme>
+					<SessionProvider>{children}</SessionProvider>
+				</Theme>
 			</body>
 		</html>
 	);

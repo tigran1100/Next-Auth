@@ -6,7 +6,7 @@ import NextAuth from "next-auth";
 import authConfig from "@/auth.config";
 
 // Routes
-const publicRoutes = ["/", "/auth/login", "/auth/register", "/auth/error"];
+const publicRoutes = ["/auth/login", "/auth/register", "/auth/error"];
 const apiAuthPrefix = "/api/auth";
 
 // AuthJS
