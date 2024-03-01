@@ -1,0 +1,16 @@
+.c-vi-container {
+	width: unset;
+	height: unset;
+}
+
+.c-vi-character {
+	border: none;
+	font-size: 20px;
+	border-radius: 8px;
+
+	/* light theme */
+	color: #65636d;
+	background-color: #f6f5fa;
+	/* background-color: #65636d; */
+	/* box-shadow: 0 2px 0 #e4e2f5; */
+}

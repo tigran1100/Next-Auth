@@ -103,12 +103,16 @@ body,
 }
 
 @media screen and (max-width: 1400px) {
-	.page_content {
+	.page_content_large,
+	.page_content_medium,
+	.page_content_small {
 		width: calc(100% - 40px);
 	}
 }
 @media screen and (max-width: 380px) {
-	.page_content {
+	.page_content_large,
+	.page_content_medium,
+	.page_content_small {
 		width: calc(100% - 20px);
 	}
 }

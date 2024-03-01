@@ -18,14 +18,8 @@
 	grid-gap: 6px;
 }
 .c_body_actions {
-	width: 100%;
 	display: flex;
 	align-items: center;
 	grid-gap: 16px;
-}
-
-@media screen and (max-width: 1000px) {
-	.c_body_actions {
-		flex-direction: column;
-	}
+	align-self: flex-start;
 }
